@@ -1,0 +1,811 @@
+
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#100d20">
+  <title>Audio book — Kitoblar olami</title>
+
+  <style>
+    :root {
+      --bg: #100d20;
+      --panel: #1d1830;
+      --card: #302447;
+      --text: #ffffff;
+      --accent: #9565e8;
+      --border: #493663;
+      --muted: #c9c0d8;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      font-size: 16px;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      font-size: 1rem;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      transition: background .2s, color .2s;
+    }
+
+    /* Qora fon */
+    body[data-theme="dark"] {
+      --bg: #100d20;
+      --panel: #1d1830;
+      --card: #302447;
+      --text: #ffffff;
+      --accent: #9565e8;
+      --border: #493663;
+      --muted: #c9c0d8;
+    }
+
+    /* Oq fon */
+    body[data-theme="white"] {
+      --bg: #f5f5f5;
+      --panel: #ffffff;
+      --card: #eeeeee;
+      --text: #111111;
+      --accent: #6741a5;
+      --border: #d0d0d0;
+      --muted: #444444;
+    }
+
+    /* Och jigarrang fon */
+    body[data-theme="brown"] {
+      --bg: #e9ddc9;
+      --panel: #f6ecdc;
+      --card: #e3d0b4;
+      --text: #111111;
+      --accent: #81552c;
+      --border: #c5ad8d;
+      --muted: #463727;
+    }
+
+    header {
+      background: var(--panel);
+      border-bottom: 1px solid var(--border);
+      padding: 18px 5%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 15px;
+      flex-wrap: wrap;
+    }
+
+    .logo {
+      color: var(--accent);
+      font-size: 1.65rem;
+      font-weight: bold;
+      white-space: nowrap;
+    }
+
+    button, a {
+      font: inherit;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    nav {
+      background: var(--panel);
+      padding: 14px 5%;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 9px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav-button {
+      background: var(--card);
+      color: var(--text);
+      border: 1px solid var(--border);
+      padding: 10px 14px;
+      border-radius: 9px;
+      cursor: pointer;
+    }
+
+    .nav-button:hover,
+    .nav-button.active {
+      background: var(--accent);
+      color: #ffffff;
+    }
+
+    .settings-wrap {
+      position: relative;
+    }
+
+    .settings-button {
+      width: 44px;
+      height: 44px;
+      background: var(--card);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 11px;
+      font-size: 24px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .settings-button:hover {
+      border-color: var(--accent);
+    }
+
+    .settings-menu {
+      position: absolute;
+      top: 52px;
+      right: 0;
+      width: 240px;
+      display: none;
+      z-index: 50;
+      padding: 7px;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      box-shadow: 0 10px 28px #0004;
+    }
+
+    .settings-menu.open {
+      display: block;
+    }
+
+    .settings-item {
+      display: block;
+      width: 100%;
+      text-align: left;
+      border: none;
+      border-radius: 8px;
+      padding: 12px;
+      color: var(--text);
+      background: transparent;
+    }
+
+    .settings-item:hover {
+      background: var(--card);
+    }
+
+    .hero {
+      text-align: center;
+      padding: 52px 20px;
+      background: linear-gradient(135deg, var(--panel), var(--bg));
+    }
+
+    .hero h1 {
+      font-size: 2rem;
+      line-height: 1.25;
+      margin: 0 0 12px;
+    }
+
+    .hero p {
+      max-width: 650px;
+      margin: auto;
+      color: var(--muted);
+    }
+
+    main {
+      max-width: 1100px;
+      margin: 28px auto;
+      padding: 0 18px 45px;
+    }
+
+    .section {
+      display: none;
+    }
+
+    .section.active {
+      display: block;
+    }
+
+    .section-heading {
+      color: var(--accent);
+      font-size: 1.7rem;
+      margin-bottom: 10px;
+    }
+
+    .description {
+      color: var(--muted);
+      margin-bottom: 22px;
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 18px;
+    }
+
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 20px;
+      margin-bottom: 16px;
+    }
+
+    .cover {
+      height: 145px;
+      background: linear-gradient(135deg, var(--accent), var(--card));
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 3rem;
+      border-radius: 11px;
+      margin-bottom: 16px;
+    }
+
+    .card h3 {
+      margin: 0 0 8px;
+    }
+
+    .card p {
+      color: var(--muted);
+    }
+
+    .action-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 10px 15px;
+      background: var(--accent);
+      color: #ffffff;
+      border: 1px solid transparent;
+      border-radius: 9px;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    .action-button.secondary {
+      background: var(--card);
+      color: var(--text);
+      border-color: var(--border);
+    }
+
+    .action-button:hover {
+      opacity: .85;
+    }
+
+    .book-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 15px;
+    }
+
+    .book-title {
+      font-size: 1.2rem;
+      font-weight: bold;
+    }
+
+    .book-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 9px;
+    }
+
+    .settings-panel {
+      display: none;
+    }
+
+    .settings-panel.open {
+      display: block;
+    }
+
+    .choice-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin: 15px 0;
+    }
+
+    .choice {
+      background: var(--card);
+      color: var(--text);
+      border: 2px solid var(--border);
+      padding: 11px 14px;
+      border-radius: 9px;
+    }
+
+    .choice.selected {
+      border-color: var(--accent);
+      outline: 1px solid var(--accent);
+    }
+
+    .swatch {
+      display: inline-block;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      border: 1px solid #888;
+      vertical-align: middle;
+      margin-right: 5px;
+    }
+
+    .size-label {
+      color: var(--muted);
+    }
+
+    .email {
+      display: inline-block;
+      color: var(--accent);
+      font-weight: bold;
+      font-size: 1.15rem;
+      overflow-wrap: anywhere;
+      text-decoration: none;
+    }
+
+    .email:hover {
+      text-decoration: underline;
+    }
+
+    .reader {
+      margin-top: 20px;
+    }
+
+    .reader[hidden] {
+      display: none;
+    }
+
+    .reader iframe {
+      display: block;
+      width: 100%;
+      height: 75vh;
+      min-height: 400px;
+      margin-top: 15px;
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      background: white;
+    }
+
+    footer {
+      background: var(--panel);
+      color: var(--muted);
+      text-align: center;
+      padding: 23px 15px;
+      border-top: 1px solid var(--border);
+    }
+
+    @media (max-width: 650px) {
+      header {
+        padding: 15px;
+      }
+
+      nav {
+        padding: 12px;
+      }
+
+      .nav-button {
+        flex: 1 1 42%;
+        padding: 10px 8px;
+      }
+
+      main {
+        margin-top: 20px;
+        padding: 0 13px 35px;
+      }
+
+      .hero {
+        padding: 38px 16px;
+      }
+
+      .hero h1 {
+        font-size: 1.7rem;
+      }
+
+      .card {
+        padding: 16px;
+      }
+
+      .book-actions .action-button {
+        flex: 1;
+      }
+
+      .reader iframe {
+        height: 65vh;
+        min-height: 350px;
+      }
+    }
+  </style>
+</head>
+
+<body data-theme="dark">
+  <header>
+    <div class="logo">🎧 Audio book</div>
+
+    <!-- Faqat belgi, "Sozlamalar" yozuvi yo‘q -->
+    <div class="settings-wrap">
+      <button
+        class="settings-button"
+        id="settingsToggle"
+        type="button"
+        aria-label="Sozlamalar"
+        title="Sozlamalar"
+        aria-expanded="false"
+      >⚙️</button>
+
+      <div class="settings-menu" id="settingsMenu">
+        <button class="settings-item" data-panel="suggestions">
+          ✉️ Takliflar
+        </button>
+        <button class="settings-item" data-panel="background">
+          🎨 Fon sozlamalari
+        </button>
+        <button class="settings-item" data-panel="font">
+          🔤 Shrift sozlamasi
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <section class="hero" id="hero">
+    <h1>Bilim olamiga xush kelibsiz!</h1>
+    <p>Kitoblarni o‘qing, audiokitoblar bilan tanishing va yangi bilimlar oling.</p>
+  </section>
+
+  <nav aria-label="Asosiy menyu">
+    <button class="nav-button active" data-section="home">🏠 Bosh sahifa</button>
+    <button class="nav-button" data-section="religious">🕌 Diniy audiokitoblar</button>
+    <button class="nav-button" data-section="guides">📘 O‘quv qo‘llanmalari</button>
+    <button class="nav-button" data-section="audio">🎧 Audiokitoblar</button>
+    <button class="nav-button" data-section="books">📚 Kitoblar</button>
+  </nav>
+
+  <main>
+    <!-- BOSH SAHIFA -->
+    <section class="section active" id="home">
+      <h2 class="section-heading">📚 Bizning kutubxonamiz</h2>
+      <p class="description">Kerakli bo‘limni tanlang.</p>
+
+      <div class="cards">
+        <article class="card">
+          <div class="cover">🕌</div>
+          <h3>Diniy audiokitoblar</h3>
+          <p>Diniy audio materiallar uchun bo‘lim.</p>
+          <button class="action-button" data-go="religious">Bo‘limni ochish</button>
+        </article>
+
+        <article class="card">
+          <div class="cover">📘</div>
+          <h3>O‘quv qo‘llanmalari</h3>
+          <p>Ta’lim olish va bilimni mustahkamlash uchun materiallar.</p>
+          <button class="action-button" data-go="guides">Bo‘limni ochish</button>
+        </article>
+
+        <article class="card">
+          <div class="cover">🎧</div>
+          <h3>Audiokitoblar</h3>
+          <p>Audio formatdagi kitoblar uchun bo‘lim.</p>
+          <button class="action-button" data-go="audio">Bo‘limni ochish</button>
+        </article>
+
+        <article class="card">
+          <div class="cover">📚</div>
+          <h3>Kitoblar</h3>
+          <p>PDF kitoblarni o‘qing va yuklab oling.</p>
+          <button class="action-button" data-go="books">Kitoblarni ochish</button>
+        </article>
+      </div>
+    </section>
+
+    <!-- DINIY AUDIOKITOBLAR -->
+    <section class="section" id="religious">
+      <h2 class="section-heading">🕌 Diniy audiokitoblar</h2>
+      <div class="card">
+        Hozircha bu bo‘limga audio joylashtirilmagan.
+      </div>
+    </section>
+
+    <!-- O‘QUV QO‘LLANMALARI -->
+    <section class="section" id="guides">
+      <h2 class="section-heading">📘 O‘quv qo‘llanmalari</h2>
+      <div class="card">
+        Hozircha bu bo‘limga qo‘llanmalar joylashtirilmagan.
+      </div>
+    </section>
+
+    <!-- AUDIOKITOBLAR -->
+    <section class="section" id="audio">
+      <h2 class="section-heading">🎧 Audiokitoblar</h2>
+      <div class="card">
+        Hozircha bu bo‘limga audiokitoblar joylashtirilmagan.
+      </div>
+    </section>
+
+    <!-- PDF KITOBLAR -->
+    <section class="section" id="books">
+      <h2 class="section-heading">📚 Kitoblar</h2>
+      <p class="description">Kitobni ochish yoki PDF nusxasini yuklab olish mumkin.</p>
+
+      <article class="card">
+        <div class="book-row">
+          <div class="book-title">📘 Fizika</div>
+
+          <div class="book-actions">
+            <button class="action-button" id="openPhysics" type="button">
+              📖 O‘qish
+            </button>
+
+            <a class="action-button secondary"
+               href="books/fizika.pdf"
+               download="Fizika.pdf">
+              ⬇️ Yuklab olish
+            </a>
+          </div>
+        </div>
+
+        <div class="reader" id="physicsReader" hidden>
+          <h3>📖 Fizika kitobi</h3>
+          <iframe
+            title="Fizika PDF kitobi"
+            src="about:blank"
+            id="physicsFrame"
+          ></iframe>
+          <p class="description">
+            PDF faylning asl nusxasi o‘zgartirilmaydi.
+          </p>
+        </div>
+      </article>
+    </section>
+
+    <!-- TAKLIFLAR SOZLAMASI -->
+    <section class="settings-panel" id="panel-suggestions">
+      <div class="card">
+        <h2>✉️ Takliflar</h2>
+        <p class="description">
+          Taklif va shikoyatlaringiz bo‘lsa shu emailga xabar yuboring.
+        </p>
+        <a class="email" href="mailto:x08ibrohim@gmail.com">
+          x08ibrohim@gmail.com
+        </a>
+        <p>
+          <a class="action-button"
+             href="mailto:x08ibrohim@gmail.com?subject=Audio%20book%20taklif">
+            ✉️ Email orqali xabar yuborish
+          </a>
+        </p>
+      </div>
+    </section>
+
+    <!-- FON SOZLAMASI -->
+    <section class="settings-panel" id="panel-background">
+      <div class="card">
+        <h2>🎨 Fon sozlamalari</h2>
+        <p class="description">Sayt fonini tanlang.</p>
+
+        <div class="choice-row">
+          <button class="choice" data-theme-choice="white">
+            <span class="swatch" style="background:#ffffff"></span> Oq
+          </button>
+
+          <button class="choice" data-theme-choice="dark">
+            <span class="swatch" style="background:#100d20"></span> Qora
+          </button>
+
+          <button class="choice" data-theme-choice="brown">
+            <span class="swatch" style="background:#e9ddc9"></span> Och jigarrang
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- SHRIFT SOZLAMASI -->
+    <section class="settings-panel" id="panel-font">
+      <div class="card">
+        <h2>🔤 Shrift sozlamasi</h2>
+        <p class="description">
+          Shrift ko‘rinishi o‘zgarmaydi. Faqat matn kattaligini tanlang.
+        </p>
+
+        <div class="choice-row">
+          <button class="action-button secondary" id="decreaseFont">
+            A− Kichraytirish
+          </button>
+          <button class="action-button secondary" id="resetFont">
+            A Standart
+          </button>
+          <button class="action-button" id="increaseFont">
+            A+ Kattalashtirish
+          </button>
+        </div>
+
+        <p class="size-label">
+          Joriy o‘lcham: <strong id="fontSizeLabel">16</strong> px
+        </p>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    © 2026 Audio book — O‘qing, o‘rganing va rivojlaning!
+  </footer>
+
+  <script>
+    const body = document.body;
+    const settingsToggle = document.getElementById("settingsToggle");
+    const settingsMenu = document.getElementById("settingsMenu");
+
+    function savePreference(key, value) {
+      try {
+        localStorage.setItem(key, value);
+      } catch (error) {
+        // Saqlash o‘chirilgan bo‘lsa ham sayt ishlaydi.
+      }
+    }
+
+    function loadPreference(key, fallback) {
+      try {
+        return localStorage.getItem(key) || fallback;
+      } catch (error) {
+        return fallback;
+      }
+    }
+
+    // Avval saqlangan sozlamalarni tiklash
+    body.dataset.theme = loadPreference("ab-theme", "dark");
+
+    let fontSize = Number(loadPreference("ab-font-size", "16"));
+    fontSize = Math.max(12, Math.min(24, fontSize));
+
+    function applyFontSize() {
+      document.documentElement.style.fontSize = fontSize + "px";
+      document.getElementById("fontSizeLabel").textContent = fontSize;
+      savePreference("ab-font-size", String(fontSize));
+    }
+
+    applyFontSize();
+
+    // Sozlamalar menyusini ochish/yopish
+    settingsToggle.addEventListener("click", function(event) {
+      event.stopPropagation();
+      const isOpen = settingsMenu.classList.toggle("open");
+      settingsToggle.setAttribute("aria-expanded", String(isOpen));
+    });
+
+    // Sozlamalar bo‘limini ochish
+    document.querySelectorAll("[data-panel]").forEach(function(button) {
+      button.addEventListener("click", function() {
+        document.querySelectorAll(".settings-panel").forEach(function(panel) {
+          panel.classList.remove("open");
+        });
+
+        document.getElementById("panel-" + button.dataset.panel)
+          .classList.add("open");
+
+        settingsMenu.classList.remove("open");
+        settingsToggle.setAttribute("aria-expanded", "false");
+
+        document.getElementById("hero").style.display = "none";
+
+        document.querySelectorAll(".section").forEach(function(section) {
+          section.classList.remove("active");
+        });
+
+        document.querySelectorAll(".nav-button").forEach(function(navButton) {
+          navButton.classList.remove("active");
+        });
+
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      });
+    });
+
+    // Saytning asosiy bo‘limlarini almashtirish
+    function showSection(sectionId) {
+      document.querySelectorAll(".section").forEach(function(section) {
+        section.classList.remove("active");
+      });
+
+      document.querySelectorAll(".settings-panel").forEach(function(panel) {
+        panel.classList.remove("open");
+      });
+
+      const target = document.getElementById(sectionId);
+      if (target) target.classList.add("active");
+
+      document.querySelectorAll(".nav-button").forEach(function(button) {
+        button.classList.toggle(
+          "active",
+          button.dataset.section === sectionId
+        );
+      });
+
+      document.getElementById("hero").style.display =
+        sectionId === "home" ? "block" : "none";
+
+      settingsMenu.classList.remove("open");
+      settingsToggle.setAttribute("aria-expanded", "false");
+
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    document.querySelectorAll(".nav-button").forEach(function(button) {
+      button.addEventListener("click", function() {
+        showSection(button.dataset.section);
+      });
+    });
+
+    document.querySelectorAll("[data-go]").forEach(function(button) {
+      button.addEventListener("click", function() {
+        showSection(button.dataset.go);
+      });
+    });
+
+    // Fon rangini tanlash
+    function updateThemeButtons() {
+      document.querySelectorAll("[data-theme-choice]").forEach(function(button) {
+        button.classList.toggle(
+          "selected",
+          button.dataset.themeChoice === body.dataset.theme
+        );
+      });
+    }
+
+    document.querySelectorAll("[data-theme-choice]").forEach(function(button) {
+      button.addEventListener("click", function() {
+        body.dataset.theme = button.dataset.themeChoice;
+        savePreference("ab-theme", body.dataset.theme);
+        updateThemeButtons();
+      });
+    });
+
+    updateThemeButtons();
+
+    // Shrift kattaligi: faqat 12–24 px oralig‘ida
+    document.getElementById("decreaseFont").addEventListener("click", function() {
+      fontSize = Math.max(12, fontSize - 1);
+      applyFontSize();
+    });
+
+    document.getElementById("increaseFont").addEventListener("click", function() {
+      fontSize = Math.min(24, fontSize + 1);
+      applyFontSize();
+    });
+
+    document.getElementById("resetFont").addEventListener("click", function() {
+      fontSize = 16;
+      applyFontSize();
+    });
+
+    // Fizika PDF ko‘ruvchisi
+    const openPhysicsButton = document.getElementById("openPhysics");
+    const physicsReader = document.getElementById("physicsReader");
+    const physicsFrame = document.getElementById("physicsFrame");
+
+    openPhysicsButton.addEventListener("click", function() {
+      if (physicsReader.hidden) {
+        physicsFrame.src = "books/fizika.pdf";
+        physicsReader.hidden = false;
+        openPhysicsButton.textContent = "✖ Kitobni yopish";
+        physicsReader.scrollIntoView({ behavior: "smooth", block: "start" });
+      } else {
+        physicsReader.hidden = true;
+        physicsFrame.src = "about:blank";
+        openPhysicsButton.textContent = "📖 O‘qish";
+      }
+    });
+
+    // Tashqariga bosilganda sozlamalar ro‘yxatini yopish
+    document.addEventListener("click", function(event) {
+      if (!event.target.closest(".settings-wrap")) {
+        settingsMenu.classList.remove("open");
+        settingsToggle.setAttribute("aria-expanded", "false");
+      }
+    });
+
+    document.addEventListener("keydown", function(event) {
+      if (event.key === "Escape") {
+        settingsMenu.classList.remove("open");
+        settingsToggle.setAttribute("aria-expanded", "false");
+      }
+    });
+  </script>
+</body>
+</html>
